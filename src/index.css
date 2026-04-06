@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ff8c94;
+  --color-secondary: #ffd1dc;
+  --color-accent: #95e1d3;
+  --color-dark: #4a4a4a;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-slate-50);
+    color: var(--color-slate-900);
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+  }
+}
+
+/* Utilitas tambahan */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
