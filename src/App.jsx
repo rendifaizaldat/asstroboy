@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ShoppingCart,
   Trash2,
@@ -10,6 +10,7 @@ import {
   CreditCard,
   Banknote,
   Printer,
+  Maximize,
 } from "lucide-react";
 import { PRODUCTS, CATEGORIES, TOPPINGS, APP_CONFIG } from "./data/mockData";
 import { useCartStore } from "./store/useCartStore";
@@ -37,7 +38,42 @@ const App = () => {
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [queueNumber, setQueueNumber] = useState(101);
 
-  // Filter Produk (Toping tidak akan muncul karena sudah dihapus dari data CATEGORIES di mockData)
+  // Fullscreen states & functions
+  const [showFullscreenOverlay, setShowFullscreenOverlay] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const enterFullscreen = () => {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    }
+    setShowFullscreenOverlay(false);
+    setIsFullscreen(true);
+  };
+
+  const exitFullscreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+    setIsFullscreen(false);
+  };
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFsChange);
+  }, []);
+
+  // Filter Produk
   const filteredProducts =
     activeCategory === "Semua"
       ? PRODUCTS
@@ -82,8 +118,21 @@ const App = () => {
             {APP_CONFIG.branchName}
           </h1>
         </div>
-        <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-          POS SIMULATOR V1.0
+
+        {/* LOGIKA TOMBOL DI HEADER */}
+        <div className="flex items-center gap-4">
+          {isFullscreen ? (
+            <button
+              onClick={exitFullscreen}
+              className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-100 hover:bg-red-500 hover:text-white transition-all"
+            >
+              <Maximize size={12} /> Keluar Fullscreen
+            </button>
+          ) : (
+            <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+              POS SIMULATOR V1.0
+            </div>
+          )}
         </div>
       </header>
 
@@ -142,9 +191,7 @@ const App = () => {
           )}
         >
           <div className="flex flex-col h-full bg-slate-50/50 overflow-hidden">
-            {" "}
-            {/* Tambahkan overflow-hidden di sini */}
-            {/* Header Struk - Dibuat lebih ramping */}
+            {/* Header Struk */}
             <div className="p-4 border-b bg-white flex justify-between items-center shrink-0">
               <h2 className="font-black text-lg italic text-dark uppercase tracking-tighter flex items-center gap-2">
                 <ShoppingCart size={20} className="text-primary" /> LIVE STRUK
@@ -156,7 +203,7 @@ const App = () => {
                 ✕
               </button>
             </div>
-            {/* LIST ITEM PESANAN - Area ini yang akan mengambil sisa ruang dan bisa di-scroll */}
+            {/* LIST ITEM PESANAN */}
             <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-300">
@@ -197,7 +244,7 @@ const App = () => {
                       </div>
                     </div>
 
-                    {/* Control Qty yang lebih compact */}
+                    {/* Control Qty */}
                     <div className="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border">
                       <div className="flex items-center gap-2 ml-auto">
                         <button
@@ -218,7 +265,7 @@ const App = () => {
                       </div>
                     </div>
 
-                    {/* Toppings - Dibuat lebih kecil untuk menghemat ruang vertical */}
+                    {/* Toppings */}
                     {item.category === "Ice Cream" && (
                       <div className="mt-2 pt-2 border-t border-dashed border-slate-100">
                         <div className="flex flex-wrap gap-1">
@@ -248,7 +295,7 @@ const App = () => {
                 ))
               )}
             </div>
-            {/* FOOTER STRUK - Dibuat Fixed di bawah dengan padding lebih kecil */}
+            {/* FOOTER STRUK */}
             <div className="p-4 bg-white border-t rounded-t-3xl shadow-[0_-10px_20px_rgba(0,0,0,0.03)] shrink-0">
               <div className="flex justify-between items-center mb-4 px-1">
                 <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
@@ -364,6 +411,7 @@ const App = () => {
                 <img
                   src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg"
                   className="h-4"
+                  alt="QRIS"
                 />
               </div>
               <div className="bg-white p-6 rounded-3xl mb-6 inline-block border-4 border-slate-50 shadow-inner">
@@ -413,7 +461,6 @@ const App = () => {
           {paymentModal === "DONE" && (
             <div className="bg-white rounded-3xl w-full max-w-sm p-2 animate-in zoom-in shadow-2xl overflow-hidden">
               <div className="border-4 border-dashed border-slate-100 rounded-2xl p-6 flex flex-col items-center bg-white">
-                {/* Header Struk */}
                 <div className="text-center mb-4">
                   <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
                     <CheckCircle2 size={28} />
@@ -426,7 +473,6 @@ const App = () => {
                   </p>
                 </div>
 
-                {/* AREA NOMOR ANTRIAN */}
                 <div className="w-full bg-slate-900 text-white rounded-2xl py-6 mb-4 text-center shadow-lg border-b-4 border-primary">
                   <p className="text-[10px] font-black opacity-60 uppercase tracking-[0.2em] mb-1">
                     Nomor Antrian
@@ -436,7 +482,6 @@ const App = () => {
                   </h1>
                 </div>
 
-                {/* RINCIAN PEMBELIAN (Paper Receipt Style) */}
                 <div className="w-full bg-slate-50 rounded-xl p-4 border border-slate-200 text-left font-mono text-[11px]">
                   <p className="text-center border-b border-dashed border-slate-300 pb-2 mb-2 font-bold uppercase">
                     Rincian Pembelian
@@ -484,15 +529,11 @@ const App = () => {
                       <span>Rp {totalPrice.toLocaleString()}</span>
                     </div>
 
-                    {/* Logika Cash (Simulasi kembalian) */}
                     {selectedMethod === "CASH" && (
                       <>
                         <div className="flex justify-between text-slate-500">
                           <span>BAYAR</span>
-                          <span>
-                            Rp {(totalPrice + 5000).toLocaleString()}
-                          </span>{" "}
-                          {/* Simulasi bayar lebih */}
+                          <span>Rp {(totalPrice + 5000).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-green-600 font-bold">
                           <span>KEMBALIAN</span>
@@ -503,7 +544,6 @@ const App = () => {
                   </div>
                 </div>
 
-                {/* Footer Buttons */}
                 <div className="mt-6 w-full space-y-2">
                   <button
                     onClick={closeAllAndReset}
@@ -518,6 +558,30 @@ const App = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* OVERLAY INISIALISASI FULLSCREEN */}
+      {showFullscreenOverlay && !isFullscreen && (
+        <div className="fixed inset-0 z-[999] bg-dark flex items-center justify-center p-6 backdrop-blur-md">
+          <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-500">
+            <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+              <Maximize size={40} className="animate-pulse" />
+            </div>
+            <h2 className="text-2xl font-black text-dark mb-2 uppercase tracking-tighter">
+              Siap Presentasi?
+            </h2>
+            <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+              Klik tombol di bawah untuk mengaktifkan{" "}
+              <b>Mode Kios Fullscreen</b> agar tampilan maksimal di tablet.
+            </p>
+            <button
+              onClick={enterFullscreen}
+              className="w-full py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 active:scale-95 transition-all"
+            >
+              Mulai Sekarang
+            </button>
+          </div>
         </div>
       )}
     </div>
