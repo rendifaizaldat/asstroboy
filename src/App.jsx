@@ -135,16 +135,19 @@ const App = () => {
         {/* RIGHT AREA: LIVE STRUK (FIXED) */}
         <aside
           className={cn(
-            "fixed inset-0 z-50 bg-white lg:relative lg:translate-x-0 lg:w-[30%] xl:w-[25%] lg:flex lg:flex-col border-l shadow-2xl transition-transform duration-300",
+            "fixed inset-0 z-50 bg-white lg:relative lg:translate-x-0 lg:w-[32%] xl:w-[25%] lg:flex lg:flex-col border-l shadow-2xl transition-transform duration-300",
             isMobileCartOpen
               ? "translate-x-0"
               : "translate-x-full lg:translate-x-0",
           )}
         >
-          <div className="flex flex-col h-full bg-slate-50/50">
-            <div className="p-5 border-b bg-white flex justify-between items-center shrink-0">
-              <h2 className="font-black text-xl italic text-dark uppercase tracking-tighter">
-                LIVE STRUK
+          <div className="flex flex-col h-full bg-slate-50/50 overflow-hidden">
+            {" "}
+            {/* Tambahkan overflow-hidden di sini */}
+            {/* Header Struk - Dibuat lebih ramping */}
+            <div className="p-4 border-b bg-white flex justify-between items-center shrink-0">
+              <h2 className="font-black text-lg italic text-dark uppercase tracking-tighter flex items-center gap-2">
+                <ShoppingCart size={20} className="text-primary" /> LIVE STRUK
               </h2>
               <button
                 onClick={() => setIsMobileCartOpen(false)}
@@ -153,75 +156,72 @@ const App = () => {
                 ✕
               </button>
             </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* LIST ITEM PESANAN - Area ini yang akan mengambil sisa ruang dan bisa di-scroll */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-300">
                   <ShoppingCart
-                    size={64}
+                    size={48}
                     strokeWidth={1}
-                    className="mb-4 opacity-20"
+                    className="mb-2 opacity-20"
                   />
-                  <p className="font-medium text-sm">Keranjang Kosong</p>
+                  <p className="text-xs font-bold uppercase tracking-widest">
+                    Kosong
+                  </p>
                 </div>
               ) : (
                 cart.map((item) => (
                   <div
                     key={item.cartId}
-                    className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative group animate-in slide-in-from-right-4 duration-300"
+                    className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 relative group"
                   >
                     <button
                       onClick={() => removeFromCart(item.cartId)}
-                      className="absolute top-3 right-3 p-2 text-slate-300 hover:text-red-500 transition-colors"
+                      className="absolute top-2 right-2 text-slate-300 hover:text-red-500"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={16} />
                     </button>
-
-                    <div className="flex gap-3 mb-3 pr-8">
+                    <div className="flex gap-2 mb-2 pr-6">
                       <img
                         src={item.image}
-                        className="w-14 h-14 rounded-xl object-cover border"
+                        className="w-10 h-10 rounded-lg object-cover border"
                         alt={item.name}
                       />
                       <div>
-                        <h4 className="font-black text-[13px] text-dark leading-tight uppercase tracking-tight">
+                        <h4 className="font-black text-[11px] text-dark leading-tight uppercase line-clamp-1">
                           {item.name}
                         </h4>
-                        <p className="text-xs font-bold text-primary mt-0.5">
+                        <p className="text-[10px] font-bold text-primary">
                           Rp {item.price.toLocaleString()}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between bg-slate-50 p-2 rounded-xl border mt-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                        Qty
-                      </span>
-                      <div className="flex items-center gap-3">
+                    {/* Control Qty yang lebih compact */}
+                    <div className="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border">
+                      <div className="flex items-center gap-2 ml-auto">
                         <button
                           onClick={() => updateQty(item.cartId, -1)}
-                          className="w-8 h-8 flex items-center justify-center bg-white rounded-lg border shadow-sm text-slate-400"
+                          className="w-6 h-6 flex items-center justify-center bg-white rounded border text-slate-400"
                         >
                           -
                         </button>
-                        <span className="font-black text-sm w-4 text-center">
+                        <span className="font-black text-xs w-4 text-center">
                           {item.qty}
                         </span>
                         <button
                           onClick={() => updateQty(item.cartId, 1)}
-                          className="w-8 h-8 flex items-center justify-center bg-primary rounded-lg shadow-sm text-white"
+                          className="w-6 h-6 flex items-center justify-center bg-primary rounded text-white"
                         >
                           +
                         </button>
                       </div>
                     </div>
 
+                    {/* Toppings - Dibuat lebih kecil untuk menghemat ruang vertical */}
                     {item.category === "Ice Cream" && (
-                      <div className="mt-4 pt-3 border-t border-dashed border-slate-200">
-                        <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest text-left">
-                          Tambah Topping:
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
+                      <div className="mt-2 pt-2 border-t border-dashed border-slate-100">
+                        <div className="flex flex-wrap gap-1">
                           {TOPPINGS.map((top) => {
                             const isSelected = item.selectedToppings.find(
                               (t) => t.id === top.id,
@@ -231,20 +231,12 @@ const App = () => {
                                 key={top.id}
                                 onClick={() => toggleTopping(item.cartId, top)}
                                 className={cn(
-                                  "px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1.5 shadow-sm",
+                                  "px-2 py-0.5 rounded text-[9px] font-bold border transition-all",
                                   isSelected
-                                    ? "bg-accent/20 border-accent text-dark ring-1 ring-accent/50"
-                                    : "bg-white border-slate-200 text-slate-500",
+                                    ? "bg-accent/20 border-accent text-dark"
+                                    : "bg-white border-slate-200 text-slate-400",
                                 )}
                               >
-                                {isSelected ? (
-                                  <CheckCircle2
-                                    size={12}
-                                    className="text-green-600"
-                                  />
-                                ) : (
-                                  <Plus size={10} />
-                                )}
                                 {top.name}
                               </button>
                             );
@@ -256,22 +248,30 @@ const App = () => {
                 ))
               )}
             </div>
-
-            <div className="p-6 bg-white border-t rounded-t-[2.5rem] shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-              <div className="flex justify-between items-end mb-6">
-                <span className="text-slate-400 font-bold text-sm uppercase tracking-widest">
-                  Total Bayar
+            {/* FOOTER STRUK - Dibuat Fixed di bawah dengan padding lebih kecil */}
+            <div className="p-4 bg-white border-t rounded-t-3xl shadow-[0_-10px_20px_rgba(0,0,0,0.03)] shrink-0">
+              <div className="flex justify-between items-center mb-4 px-1">
+                <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                  Total
                 </span>
-                <span className="text-3xl font-black text-dark tracking-tighter">
+                <span className="text-xl font-black text-dark tracking-tighter">
                   Rp {totalPrice.toLocaleString()}
                 </span>
               </div>
-              <button
-                onClick={() => cart.length > 0 && setPaymentModal("SELECT")}
-                className="w-full py-4 bg-dark text-white rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
-              >
-                Bayar Sekarang
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={clearCart}
+                  className="flex-1 py-3 rounded-xl border-2 border-slate-100 font-black text-slate-400 uppercase text-[10px] tracking-widest active:bg-slate-50"
+                >
+                  Reset
+                </button>
+                <button
+                  onClick={() => cart.length > 0 && setPaymentModal("SELECT")}
+                  className="flex-[2] py-3 bg-dark text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all"
+                >
+                  Bayar Sekarang
+                </button>
+              </div>
             </div>
           </div>
         </aside>
